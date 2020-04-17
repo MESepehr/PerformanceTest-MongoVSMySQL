@@ -8,7 +8,7 @@ manyData=[];
 var total = 1000 ;
 for(var i = 0 ; i<1000 ; i++)
 {
-    manyData.push({name:randomName(),adress:randomName()+' '+randomName()+' '+randomName(),phone:Math.floor(Math.random()*10000000000),school:Math.floor(i/(total/4))+1,class:Math.floor(i/(total/40))+1})
+    manyData.push({name:randomName(),adress:randomAdress(),phone:Math.floor(Math.random()*10000000000),school:Math.floor(i/(total/4))+1,class:Math.floor(i/(total/40))+1})
 }
 
 function randomName()
@@ -20,6 +20,11 @@ function randomName()
         str+=String.fromCharCode(97+Math.floor(Math.random()*25))
     }
     return str ;
+}
+
+function randomAdress()
+{
+    return randomName()+' '+randomName()+' '+randomName();
 }
 
 var tim = new Date().getTime();
@@ -39,6 +44,32 @@ MongoClient.connect(url,{ useUnifiedTopology: true }, function(err, db) {
     console.log(res.insertedCount+" document inserted: "+res.result.ok);
     db.close();
 
-    console.log('* Insert tooks : '+(new Date().getTime()-tim)+"\n\n");
+    console.log('* Insert tooks : '+(new Date().getTime()-tim));
+  });
+});
+
+
+
+//////////////////////////MySQL
+
+console.log('\n\n**********************mySQL***********************\n\n')
+
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "performanceTest"
+});
+
+con.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected to mySQL!");
+  var sql = "INSERT INTO customers2 (name, adress) VALUES (?, ?),(?, ?)";
+  con.query(sql,[randomName(),randomAdress(),randomName(),randomAdress()], function (err, result) {
+    if (err) throw err;
+    console.log(result.affectedRows + " record inserted");
+    con.destroy();
   });
 });
