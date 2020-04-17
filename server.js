@@ -5,8 +5,8 @@ var url = "mongodb://localhost:27017/";
  
 var manyData = [{ name: "Company Inc", address: "Highway 37" ,phone:"09434832"}];
 manyData=[];
-var total = 1000 ;
-for(var i = 0 ; i<1000 ; i++)
+var total = 10000 ;
+for(var i = 0 ; i<total ; i++)
 {
     manyData.push({name:randomName(),adress:randomAdress(),phone:Math.floor(Math.random()*10000000000),school:Math.floor(i/(total/4))+1,class:Math.floor(i/(total/40))+1})
 }
@@ -63,13 +63,30 @@ var con = mysql.createConnection({
   database: "performanceTest"
 });
 
+
+
+var insertQueryString = "INSERT INTO customers2 (name, adress,phone,school,class) VALUES ";
+var insertData=[];
+
+for(i = 0 ; i<manyData.length ; i++)
+{
+    insertQueryString = insertQueryString+"(?,?,?,?,?),";
+    insertData.push(manyData[i].name,manyData[i].address,manyData[i].phone,manyData[i].school,manyData[i].class);
+}
+
+insertQueryString = insertQueryString.substring(0,insertQueryString.length-1);
+//console.log(insertQueryString);
+
+tim = new Date().getTime();
+
 con.connect(function(err) {
   if (err) throw err;
   console.log("Connected to mySQL!");
-  var sql = "INSERT INTO customers2 (name, adress) VALUES (?, ?),(?, ?)";
-  con.query(sql,[randomName(),randomAdress(),randomName(),randomAdress()], function (err, result) {
+  var sql = insertQueryString;
+  con.query(sql,insertData, function (err, result) {
     if (err) throw err;
     console.log(result.affectedRows + " record inserted");
     con.destroy();
+    console.log("Inserting in mySQL tooks "+(new Date().getTime()-tim));
   });
 });
