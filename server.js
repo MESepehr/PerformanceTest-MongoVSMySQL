@@ -1,4 +1,14 @@
 console.log("Helo server");
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/mydb";
+var mysql = require('mysql');
+  
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "performanceTest"
+});
 
 var manyData = [{ name: "Company Inc", address: "Highway 37" ,phone:"09434832"}];
 manyData=[];
@@ -30,8 +40,6 @@ var tim ;
 insertMongo();
 function insertMongo()
 {
-  var MongoClient = require('mongodb').MongoClient;
-  var url = "mongodb://localhost:27017/mydb";
   
   
   tim = new Date().getTime();
@@ -60,19 +68,11 @@ function insertMongo()
 
 //////////////////////////MySQL
 
+
 function sqlInsert()
 {
   console.log('\n\n**********************mySQL***********************\n\n')
 
-
-  var mysql = require('mysql');
-  
-  var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "performanceTest"
-  });
   
   
   
@@ -97,9 +97,59 @@ function sqlInsert()
     con.query(sql,insertData, function (err, result) {
       if (err) throw err;
       console.log(result.affectedRows + " record inserted");
-      con.destroy();
+      //con.destroy();
       console.log("Inserting in mySQL tooks "+(new Date().getTime()-tim));
+      mongoSelect();
     });
   });
+
+}
+
+
+///Mongo part again
+
+
+
+function mongoSelect()
+{
+  var MongoClient = require('mongodb').MongoClient;
+  var url = "mongodb://localhost:27017/";
+
+  console.log("\n\n********************** Mongo findOne **********************\n\n")
+
+  tim = new Date().getTime();
+  
+  MongoClient.connect(url,{ useUnifiedTopology: true }, function(err, db) {
+    if (err) throw err;
+    var dbo = db.db("mydb");
+    dbo.collection("customers2").findOne({school:3}, function(err, result) {
+      if (err) throw err;
+      console.log(result);
+      db.close();
+      console.log("Mongo search tooks "+(new Date().getTime()-tim));
+      sqlSelect();
+    });
+  });
+}
+
+
+function sqlSelect()
+{
+  console.log('\n\n**********************mySQL Select***********************\n\n')
+
+  
+  tim = new Date().getTime();
+  
+  //con.connect(function(err) {
+    //if (err) throw err;
+    console.log("Connected to mySQL!");
+    var sql = "SELECT * FROM customers2 WHERE school=3 LIMIT 1;";
+    con.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log(result[0]);
+      con.destroy();
+      console.log("Select in mySQL tooks "+(new Date().getTime()-tim));
+    });
+  //});
 
 }
