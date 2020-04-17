@@ -1,5 +1,7 @@
 console.log("Helo server");
 var MongoClient = require('mongodb').MongoClient;
+var dbo ;
+var dbCashed ;
 var url = "mongodb://localhost:27017/mydb";
 var mysql = require('mysql');
   
@@ -45,8 +47,10 @@ function insertMongo()
   tim = new Date().getTime();
   MongoClient.connect(url,{ useUnifiedTopology: true }, function(err, db) {
     if (err) throw err;
+    dbCashed = db ;
+    console.log("\n\n********************** Mongo insert **********************\n\n")
     console.log("Database created!");
-    var dbo = db.db("mydb");
+    dbo = db.db("mydb");
     /*dbo.createCollection("customers", function(err, res) {
       if (err) throw err;
       console.log("Collection created!");
@@ -56,7 +60,7 @@ function insertMongo()
     dbo.collection("customers2").insertMany(manyData, function(err, res) {
       if (err) throw err;
       console.log(res.insertedCount+" document inserted: "+res.result.ok);
-      db.close();
+      //db.close();
 
       console.log('* Insert tooks : '+(new Date().getTime()-tim));
 
@@ -119,17 +123,17 @@ function mongoSelect()
 
   tim = new Date().getTime();
   
-  MongoClient.connect(url,{ useUnifiedTopology: true }, function(err, db) {
-    if (err) throw err;
-    var dbo = db.db("mydb");
+  //MongoClient.connect(url,{ useUnifiedTopology: true }, function(err, db) {
+    //if (err) throw err;
+    //var dbo = db.db("mydb");
     dbo.collection("customers2").findOne({school:3}, function(err, result) {
-      if (err) throw err;
-      console.log(result);
-      db.close();
-      console.log("Mongo search tooks "+(new Date().getTime()-tim));
-      sqlSelect();
+    if (err) throw err;
+    console.log(result);
+    dbCashed.close();
+    console.log("Mongo search tooks "+(new Date().getTime()-tim));
+    sqlSelect();
     });
-  });
+  //});
 }
 
 
